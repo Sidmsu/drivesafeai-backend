@@ -42,4 +42,5 @@ def compute_ear(image_path):
         right_ear = calculate_ear(right_eye)
         avg_ear = round((left_ear + right_ear) / 2.0, 2)
 
-        return round(1.0 - avg_ear, 2), round(avg_ear, 2)
+        return round(avg_ear, 2), None  # EAR is the real signal; attention_score optional
+

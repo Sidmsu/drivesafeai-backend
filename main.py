@@ -27,12 +27,14 @@ async def analyze_image_endpoint(file: UploadFile = File(...)):
     drowsiness_score, attention_score = compute_ear(temp_file_path)
 
     # Decide user status
-    if drowsiness_score is not None and drowsiness_score >= 0.7:
-        status = "fatigue detected"
-    elif drowsiness_score is not None:
-        status = "attentive"
+    if drowsiness_score is not None:
+        if drowsiness_score < 0.25:
+            status = "fatigue detected"
+        else:
+            status = "attentive"
     else:
         status = "no face detected"
+
 
     # Delete temporary image
     os.remove(temp_file_path)
