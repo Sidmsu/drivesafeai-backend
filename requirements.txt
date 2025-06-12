@@ -1,11 +1,7 @@
 fastapi
 uvicorn[standard]
-torch
+numpy
 opencv-python
 pillow
 mediapipe
-numpy
-requests
 python-multipart
-pandas
-seaborn
