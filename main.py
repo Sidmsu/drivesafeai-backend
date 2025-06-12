@@ -8,6 +8,7 @@ from yolo_detector import detect_objects
 
 app = FastAPI()
 
+# Allow frontend requests from any domain (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,16 +18,17 @@ app.add_middleware(
 
 @app.post("/analyze-image")
 async def analyze_image_endpoint(file: UploadFile = File(...)):
+    # Save the uploaded image temporarily
     temp_file_path = f"temp/{file.filename}"
     os.makedirs("temp", exist_ok=True)
     with open(temp_file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Run both YOLO + EAR
+    # Run both YOLOv5 object detection and EAR-based analysis
     yolo_detections, confidences = detect_objects(temp_file_path)
     drowsiness_score, attention_score = compute_ear(temp_file_path)
 
-    # Decide status based on both
+    # Decision logic for alert status
     if "yawn" in yolo_detections or (drowsiness_score is not None and drowsiness_score >= 0.7):
         status = "fatigue detected"
     elif "phone" in yolo_detections:
@@ -36,6 +38,7 @@ async def analyze_image_endpoint(file: UploadFile = File(...)):
     else:
         status = "no face detected"
 
+    # Cleanup
     os.remove(temp_file_path)
 
     return {
@@ -45,9 +48,3 @@ async def analyze_image_endpoint(file: UploadFile = File(...)):
         "drowsiness_score": drowsiness_score,
         "attention_score": attention_score
     }
-
-
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 8000))  # Fallback to 8000 for local
-    uvicorn.run(app, host="0.0.0.0", port=port)
