@@ -45,3 +45,9 @@ async def analyze_image_endpoint(file: UploadFile = File(...)):
         "drowsiness_score": drowsiness_score,
         "attention_score": attention_score
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))  # Fallback to 8000 for local
+    uvicorn.run(app, host="0.0.0.0", port=port)
